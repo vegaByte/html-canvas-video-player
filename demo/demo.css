@@ -85,3 +85,178 @@ body {
 	background: #790c17;
 	opacity: 0.8;
 }
+
+/* VIDEO CONTROLS STYLES */
+.video-controls-wrapper {
+	position: relative;
+  margin: 0 auto;
+  padding: 0 20px 20px 20px;
+  max-width: 840px;
+}
+.video-controls {
+	margin: 0;
+	padding: 0 0.3em;
+	display: block;
+	background-color: rgba(0,0,0,0.87);
+}
+.video-controls > * {
+	display: inline-block;
+	vertical-align: middle;
+}
+.video-controls > *:not(:last-child) {
+	margin-right: 5px !important;
+}
+.video-controls .play-pause {
+	outline: none;
+	border: 0px solid;
+	background: transparent;
+	height: 42px;
+	width: 42px;
+	margin: 0;
+	padding: 0;
+}
+.video-controls .play-pause:active {
+	background-color: purple;
+}
+.video-controls .play-pause svg {
+   fill: #fff;
+   opacity: 0.85;
+}
+.video-controls .volume-container {
+	margin: 0;
+	padding: 0;
+	height: 42px;
+	padding-top: 8px;
+}
+/* VOLUME SLIDER */
+.video-controls .volume-container .volume-control {
+	vertical-align: middle;
+	margin: 0;
+	padding: 0;
+}
+.video-controls .volume-container svg {
+	vertical-align: middle;
+	opacity: 0.85;
+}
+.video-controls .time {
+	color: rgba(255,255,255,0.8);
+	/*font-weight: 600;*/
+	font-size: 12px;
+	transition: all .2s ease-out;
+}
+
+/* RANGE VOLUME STYLES */
+
+/*============== BASE ===============*/
+.video-controls input[type=range] {
+  -webkit-appearance: none; /* Hides the slider so that custom slider can be made */
+  /*width: 100%; /* Specific width is required for Firefox. */
+  background: transparent; /* Otherwise white in Chrome */
+}
+
+.video-controls input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+
+.video-controls input[type=range]:focus {
+  outline: none; /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */
+}
+
+.video-controls input[type=range]::-ms-track {
+  width: 100%;
+  cursor: pointer;
+
+  /* Hides the slider so custom styles can be added */
+  background: transparent; 
+  border-color: transparent;
+  color: transparent;
+}
+
+/*============== CIRCLE =============*/
+/* Special styling for WebKit/Blink */
+.video-controls input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  border: 1px solid #000000;
+  height: 17px;
+  width: 17px;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+  margin-top: -5px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d; /* Add cool effects to your sliders! */
+}
+
+/* All the same stuff for Firefox */
+.video-controls input[type=range]::-moz-range-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 17px;
+  width: 17px;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/* All the same stuff for IE */
+.video-controls input[type=range]::-ms-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 17px;
+  width: 17px;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+/*============== BAR ================*/
+.video-controls input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: purple;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+
+.video-controls input[type=range]:focus::-webkit-slider-runnable-track {
+  background: purple;
+}
+
+.video-controls input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: purple;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+
+.video-controls input[type=range]::-ms-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  border-width: 16px 0;
+  color: transparent;
+}
+.video-controls input[type=range]::-ms-fill-lower {
+  background: purple;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+.video-controls input[type=range]:focus::-ms-fill-lower {
+  background: purple;
+}
+.video-controls input[type=range]::-ms-fill-upper {
+  background: purple;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+.video-controls input[type=range]:focus::-ms-fill-upper {
+  background: purple;
+}

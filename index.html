@@ -34,7 +34,9 @@
 				</div>
 			</div>
 		</div>
+		<div class="js-controls"></div>
 	</div>
+
 
 	<div class="content">
 		<h1 class="margin-bottom-10">HTML canvas video player</h1>
@@ -98,7 +100,15 @@ var canvasVideo = new <span class="color-success">CanvasVideoPlayer</span>({
     <span class="color-grey">// <span class="color-error">IMPORTANT</span> On iOS can't be used together with autoplay, autoplay will be disabled</span>
     audio: false, <span class="color-grey">// can be true/false (it will use video file for audio), or selector for a separate audio file</span>
     resetOnLastFrame: true, <span class="color-grey">// should video reset back to the first frame after it finishes playing</span>
-		loop: false
+    <span>loop: false,</span>
+
+    <span class="color-grey">// <span class="color-success">New </span> OPTIONS</span>
+    controlsSelector: 'js-controls',<span class="color-grey"> // Controls container, play/pause button, volume control and video timer. NOTE: volume control disabled for iOS devices, this is managing for the hardware volume control.</span>
+    videoSrc: $('.js-video').attr('src'), <span class="color-grey">// Required if video element of "videoSelector" doesnt have &#60;source&#62; child</span>
+    onTimeUpdate: onUpdateCallBack,<span class="color-grey"> // Callback when the currentTime of video is changed</span>
+    onReady: onReadyCallBack,<span class="color-grey"> // Callback when the video player is ready</span>
+    onError: onErrorCallback,<span class="color-grey"> // Callback when a error is presented</span>
+    dev: true<span class="color-grey"> // In "dev" mode errors is showing</span>
 });
 </pre>
 
@@ -118,6 +128,13 @@ canvasVideo.playPause()
 
 <span class="color-grey">// Draws current frame on canvas, should not be called manually</span>
 canvasVideo.drawFrame()
+
+<span class="color-grey">// <span class="color-success">New</span> Methods</span>
+<span class="color-grey">// Set the volume to video (0-100)</span>
+canvasVideo.setVolume(volumePercent)
+
+<span class="color-grey">// Get video current time</span>
+canvasVideo.getCurrentTime()
 </pre>
 
 <h4 class="margin-top-30">Detecting iPhone:</h4>
@@ -151,11 +168,26 @@ else {
 
 
 	<script>
+		var readyCallback = function () {
+			console.log('Video Ready!');
+		}
+		var errorCallback = function (errors) {
+			console.log('errors:', errors.join(', '));
+		}
+		var onTimeUpdate = function (currentTime) {
+			console.log('time:', currentTime);
+		}
 		var canvasVideo = new CanvasVideoPlayer({
 			videoSelector: '.js-video',
 			canvasSelector: '.js-canvas',
 			timelineSelector: '.js-timeline',
-			audio: false
+			audio: true,
+			videoSrc: $('.js-video').attr('src'),
+			audio: true,
+			onReady: readyCallback,
+			controlsSelector: '.js-controls'
+			// onError: errorCallback,
+			// onTimeUpdate: timeUpdateCallback,
 		});
 	</script>
 </body>
