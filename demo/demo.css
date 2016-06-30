@@ -5,13 +5,13 @@ body {
 .color-grey {
 	color: #aaa;
 }
-
+/*
 .header {
 	border-bottom: 1px solid #ddd;
 	margin-bottom: 20px;
 	background: #fff;
 }
-
+*/
 .video-wrapper {
 	position: relative;
 	margin: 0 auto;
@@ -101,7 +101,7 @@ body {
 }
 .video-controls > * {
 	display: inline-block;
-	vertical-align: middle;
+	vertical-align: middle !important;
 }
 .video-controls > *:not(:last-child) {
 	margin-right: 5px !important;

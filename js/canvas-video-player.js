@@ -26,6 +26,7 @@ var CanvasVideoPlayer = function(options) {
 		resetOnLastFrame: true,
 		loop            : false,
 		onTimeUpdate    : false,
+		onPlay          : false,
 		onReady         : false,
 		onError         : false,
 		dev             : true // In "dev" mode errors is showing
@@ -93,6 +94,10 @@ var CanvasVideoPlayer = function(options) {
 
 	if (typeof this.options.onTimeUpdate !== "function" && this.options.onTimeUpdate){
 		this.errors.push('Value for the "onTimeUpdate" is not a function');
+	}
+
+	if (typeof this.options.onPlay !== "function" && this.options.onPlay){
+		this.errors.push('Value for the "onPlay" is not a function');
 	}
 
 	if (typeof this.options.onReady !== "function" && this.options.onReady){
@@ -317,6 +322,9 @@ CanvasVideoPlayer.prototype.play = function() {
 		// Resync audio and video
 		this.audio.currentTime = this.video.currentTime;
 		this.audio.play();
+	}
+	if (this.options.onPlay){
+		this.options.onPlay();
 	}
 };
 
