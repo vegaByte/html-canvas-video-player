@@ -8,7 +8,8 @@
 	<title>HTML canvas video player</title>
 
 	<link rel="stylesheet" href="https://stanko.github.io/skyblue/css/skyblue.css">
-	<link rel="stylesheet" href="demo/demo.css">
+  <link rel="stylesheet" href="demo/demo.css">
+	<link rel="stylesheet" href="demo/canvas-video-player.css">
 </head>
 
 <body>
@@ -18,25 +19,8 @@
 			<a href="https://github.com/Stanko/html-canvas-video-player/archive/master.zip">Download</a>
 		</div>
 	</div>
-	<div class="video-wrapper js-video-wrapper">
-		<div class="video-responsive">
-			<video class="video js-video" muted>
-				<source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.webm" type="video/webm">
-				<source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4" type="video/mp4">
-				<source src="http://www.quirksmode.org/html5/videos/big_buck_bunny.ogv" type="video/ogg">
-				Your browser does not support HTML5 video.
-			</video>
 
-			<canvas class="canvas js-canvas"></canvas>
-
-			<div class="video-timeline js-timeline">
-				<div class="video-timeline-passed js-timeline-passed">
-				</div>
-			</div>
-		</div>
-		<div class="js-controls"></div>
-	</div>
-
+  <div id="canvas-player-alone"></div>
 
 	<div class="content">
 		<h1 class="margin-bottom-10">HTML canvas video player</h1>
@@ -163,32 +147,28 @@ else {
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 	<script src="demo/fastclick.js"></script>
 	<script src="demo/demo.js"></script>
-
 	<script src="js/canvas-video-player.js"></script>
 
-
-	<script>
-		var readyCallback = function () {
-			console.log('Video Ready!');
-		}
-		var errorCallback = function (errors) {
-			console.log('errors:', errors.join(', '));
-		}
-		var onTimeUpdate = function (currentTime) {
-			console.log('time:', currentTime);
-		}
-		var canvasVideo = new CanvasVideoPlayer({
-			videoSelector: '.js-video',
-			canvasSelector: '.js-canvas',
-			timelineSelector: '.js-timeline',
-			audio: true,
-			videoSrc: $('.js-video').attr('src'),
-			audio: true,
-			onReady: readyCallback,
-			controlsSelector: '.js-controls'
-			// onError: errorCallback,
-			// onTimeUpdate: timeUpdateCallback,
-		});
-	</script>
+  <script type="text/javascript">
+    var readyCallback = function () {
+     console.log('Video Ready!');
+    }
+    var errorCallback = function (errors) {
+     console.log('errors:', errors.join(', '));
+    }
+    var onTimeUpdate = function (currentTime) {
+     console.log('time:', currentTime);
+    }
+    var canvasVideo = new CanvasVideoPlayer({
+     audio: true,
+     videoSrc: 'http://www.quirksmode.org/html5/videos/big_buck_bunny.mp4',
+     audio: true,
+     onReady: readyCallback,
+     playOnTouch: true,
+     parent: '#canvas-player-alone'
+     // onError: errorCallback,
+     // onTimeUpdate: timeUpdateCallback,
+    });
+  </script>
 </body>
 </html>

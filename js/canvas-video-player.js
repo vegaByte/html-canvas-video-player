@@ -13,16 +13,13 @@ var CanvasVideoPlayer = function(options) {
 	var i;
 
 	this.options = {
-		// videoSelector: '.js-video',
-		// canvasSelector: '.js-canvas',
-		// timelineSelector: '.js-timeline',
-		controlsSelector: false,
 		videoSrc        : false, // Required if video element of "videoSelector" doesnt have <source> child
+		parent 					: false,
 		framesPerSecond : 25,
 		hideVideo       : true,
 		autoplay        : false,
+		playOnTouch			: false,
 		audio           : false, // can be a element <audio> or boolean (create if true)
-		timelineSelector: false, 
 		resetOnLastFrame: true,
 		loop            : false,
 		onTimeUpdate    : false,
@@ -35,30 +32,15 @@ var CanvasVideoPlayer = function(options) {
 	for (i in options) {
 		this.options[i] = options[i];
 	}
-
-	this.video          = document.querySelector(this.options.videoSelector);
-	this.canvas         = document.querySelector(this.options.canvasSelector);
-	this.timeline       = document.querySelector(this.options.timelineSelector);
-	this.timelinePassed = document.querySelectorAll(this.options.timelineSelector + '> div')[0];
+	this.player 				= createElementPro('.video-wrapper', this.options.parent);
+	this.videoWrapper 	= createElementPro('.video-responsive', this.player);
+	this.video          = createElementPro('%video', this.videoWrapper, {src: this.options.videoSrc});
+	this.canvas         = createElementPro('%canvas.canvas', this.videoWrapper);
+	this.timeline       = createElementPro('.video-timeline', this.videoWrapper);
+	this.timelinePassed = createElementPro('.video-timeline-passed', this.timeline);
 	this.errors         = [];
 	this.ready          = false;
-	this.controls       = document.querySelector(this.options.controlsSelector);
-
-	if (!this.options.videoSelector || !this.video) {
-		this.errors.push('No "videoSelector" property, or the element is not found');
-	}
-
-	if (!this.options.canvasSelector || !this.canvas) {
-		this.errors.push('No "canvasSelector" property, or the element is not found');
-	}
-
-	if (this.options.timelineSelector && !this.timeline) {
-		this.errors.push('Element for the "timelineSelector" selector not found');
-	}
-
-	if (this.options.timelineSelector && !this.timelinePassed) {
-		this.errors.push('Element for the "timelinePassed" not found');
-	}
+	this.controls       = createElementPro('.js-controls', this.player);
 
 	if (this.options.audio) {
 		if (typeof(this.options.audio) === 'string'){
@@ -106,10 +88,6 @@ var CanvasVideoPlayer = function(options) {
 
 	if (typeof this.options.onError !== "function" && this.options.onError){
 		this.errors.push('Value for the "onError" is not a function');
-	}
-
-	if (this.options.controlsSelector && !this.controls) {
-		this.errors.push('Element for the "controlsSelector" selector not found');
 	}
 
 	if (this.errors.length > 0){
@@ -212,16 +190,16 @@ CanvasVideoPlayer.prototype.bind = function() {
 	var self = this;
 
 	// Playes or pauses video on canvas click
-	this.canvas.addEventListener('click', cvpHandlers.canvasClickHandler = function() {
-		self.playPause();
-	});
+	if (this.options.playOnTouch || !this.options.controlsSelector){
+		this.canvas.addEventListener('click', cvpHandlers.canvasClickHandler = function() {
+			self.playPause();
+		});
+	}
 
 	// On every time update draws frame
 	this.video.addEventListener('timeupdate', cvpHandlers.videoTimeUpdateHandler = function() {
 		self.drawFrame();
-		if (self.options.timelineSelector) {
-			self.updateTimeline();
-		}
+		self.updateTimeline();
 		if (self.controls){
 			self.updateTimeDisplay();
 		}
@@ -246,13 +224,11 @@ CanvasVideoPlayer.prototype.bind = function() {
 	}
 
 	// Click on the video seek video
-	if (self.options.timelineSelector) {
-		this.timeline.addEventListener('click', function(e) {
-			var offset = e.clientX - self.getOffset(self.canvas).left;
-			var percentage = offset / self.timeline.offsetWidth;
-			self.jumpTo(percentage);
-		});
-	}
+	this.timeline.addEventListener('click', function(e) {
+		var offset = e.clientX - self.getOffset(self.canvas).left;
+		var percentage = offset / self.timeline.offsetWidth;
+		self.jumpTo(percentage);
+	});
 
 	// Cache canvas size on resize (doing it only once in a second)
 	window.addEventListener('resize', cvpHandlers.windowResizeHandler = function() {
@@ -281,7 +257,9 @@ CanvasVideoPlayer.prototype.bind = function() {
 	}
 
 	this.unbind = function() {
-		this.canvas.removeEventListener('click', cvpHandlers.canvasClickHandler);
+		if (this.options.playOnTouch){
+			this.canvas.removeEventListener('click', cvpHandlers.canvasClickHandler);
+		}
 		this.video.removeEventListener('timeupdate', cvpHandlers.videoTimeUpdateHandler);
 		this.video.removeEventListener('canplay', cvpHandlers.videoCanPlayHandler);
 		window.removeEventListener('resize', cvpHandlers.windowResizeHandler);
