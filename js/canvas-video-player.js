@@ -15,17 +15,20 @@ var CanvasVideoPlayer = function(options) {
 	this.options = {
 		videoSrc        : false, // Required if video element of "videoSelector" doesnt have <source> child
 		parent 					: false,
+		controls        : true,
 		framesPerSecond : 25,
 		hideVideo       : true,
 		autoplay        : false,
-		playOnTouch			: false,
-		audio           : false, // can be a element <audio> or boolean (create if true)
+		playOnTouch     : true,
+		audio           : true, // can be a element <audio> or boolean (create if true)
 		resetOnLastFrame: true,
 		loop            : false,
 		onTimeUpdate    : false,
 		onPlay          : false,
+		onPause         : false,
 		onReady         : false,
 		onError         : false,
+		onEnded         : false,
 		dev             : true // In "dev" mode errors is showing
 	};
 
@@ -36,11 +39,11 @@ var CanvasVideoPlayer = function(options) {
 	this.videoWrapper 	= createElementPro('.video-responsive', this.player);
 	this.video          = createElementPro('%video', this.videoWrapper, {src: this.options.videoSrc});
 	this.canvas         = createElementPro('%canvas.canvas', this.videoWrapper);
-	this.timeline       = createElementPro('.video-timeline', this.videoWrapper);
-	this.timelinePassed = createElementPro('.video-timeline-passed', this.timeline);
 	this.errors         = [];
 	this.ready          = false;
-	this.controls       = createElementPro('.js-controls', this.player);
+	if (this.options.controls){
+		this.controls = createElementPro('.video-controls-wrapper', this.player);
+	}
 
 	if (this.options.audio) {
 		if (typeof(this.options.audio) === 'string'){
@@ -88,6 +91,14 @@ var CanvasVideoPlayer = function(options) {
 
 	if (typeof this.options.onError !== "function" && this.options.onError){
 		this.errors.push('Value for the "onError" is not a function');
+	}
+
+	if (typeof this.options.onEnded !== "function" && this.options.onEnded){
+		this.errors.push('Value for the "onEnded" is not a function');
+	}
+
+	if (typeof this.options.onPause !== "function" && this.options.onPause){
+		this.errors.push('Value for the "onPause" is not a function');
 	}
 
 	if (this.errors.length > 0){
@@ -190,7 +201,7 @@ CanvasVideoPlayer.prototype.bind = function() {
 	var self = this;
 
 	// Playes or pauses video on canvas click
-	if (this.options.playOnTouch || !this.options.controlsSelector){
+	if (this.options.playOnTouch){
 		this.canvas.addEventListener('click', cvpHandlers.canvasClickHandler = function() {
 			self.playPause();
 		});
@@ -225,7 +236,7 @@ CanvasVideoPlayer.prototype.bind = function() {
 
 	// Click on the video seek video
 	this.timeline.addEventListener('click', function(e) {
-		var offset = e.clientX - self.getOffset(self.canvas).left;
+		var offset = e.clientX - self.getOffset(self.timeline).left;
 		var percentage = offset / self.timeline.offsetWidth;
 		self.jumpTo(percentage);
 	});
@@ -239,9 +250,9 @@ CanvasVideoPlayer.prototype.bind = function() {
 			self.drawFrame();
 		}, self.RESIZE_TIMEOUT);
 	});
-
+	this.audioControlEnabled = false;
 	if (this.controls){
-		if (!this.iOS){
+		if (!this.iOS && this.audioControlEnabled){
 			// Triggered when leave the dragging
 			this.volumeControl.addEventListener('change', cvpHandlers.volumeChangeHandler = function(e) {
 				self.setVolume(self.volumeControl.value);
@@ -315,6 +326,10 @@ CanvasVideoPlayer.prototype.pause = function() {
 	if (this.options.audio) {
 		this.audio.pause();
 	}
+	if (this.options.onPause){
+		console.log('CanvasVideoPlayer.prototype.pause');
+		this.options.onPause();
+	}
 };
 
 CanvasVideoPlayer.prototype.playPause = function() {
@@ -346,6 +361,9 @@ CanvasVideoPlayer.prototype.loop = function() {
 	if (this.video.currentTime >= this.video.duration) {
 		this.togglePlayElement();
 		this.playing = false;
+		if (this.options.onEnded){
+			this.options.onEnded();
+		}
 
 		if (this.options.resetOnLastFrame === true) {
 			this.video.currentTime = 0;
@@ -394,16 +412,24 @@ CanvasVideoPlayer.prototype.setVolume = function(vol) {
 // Build elements controls
 CanvasVideoPlayer.prototype.createControls = function() {
 	// CONTAINER
-	var controlsContainer = createElementPro('.video-controls', this.controls);
+	this.controlsContainer = createElementPro('.video-controls', this.controls);
 
 	// PLAY PAUSE
-	this.playControl = createElementPro('%button.play-pause', controlsContainer);
+	this.playControl = createElementPro('%button.play-pause', this.controlsContainer);
 	var playPauseSvg = '<svg width="100%" height="100%" viewBox="0 0 36 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><path id="play-path" d="M 11 10 L 18 13.74 18 22.28 11 26 M 18 13.74 L 26 18 26 18 18 22.28"><animate id="play-button-animation" begin="indefinite" attributeT ype="XML" attributeName="d" fill="freeze" to="M11,10 L17,10 17,26 11,26 M20,10 L26,10 26,26 20,26" from="M11,10 L18,13.74 18,22.28 11,26 M18,13.74 L26,18 26,18 18,22.28" dur="0.1s" keySplines=".4 0 1 1" repeatCount="1"></animate></path></defs><use xlink:href="#play-path"></use></svg>';
 	this.playControl.innerHTML = playPauseSvg;
 
+	// PROGRESS BAR
+	var timeLineParent;
+	if (this.options.controls){ timeLineParent = this.controlsContainer; }
+	else { timeLineParent = this.videoWrapper; }
+	var iOsClass = this.iOS ? 'ios' : '';
+	this.timeline = createElementPro('.video-timeline '+iOsClass, timeLineParent);
+	this.timelinePassed = createElementPro('.video-timeline-passed', this.timeline);
+
 	// VOLUME
-	if (!this.iOS){
-		var volumeContainer = createElementPro('.volume-container.needsclick', controlsContainer);
+	if (!this.iOS && this.audioControlEnabled){
+		var volumeContainer = createElementPro('.volume-container.needsclick', this.controlsContainer);
 		var volumeIcon = '<svg id="volume-icon" fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
 		volumeContainer.innerHTML = volumeIcon;
 		this.volumeControl = createElementPro('%input#volume-control.volume-control.needsclick', volumeContainer, {
@@ -412,7 +438,7 @@ CanvasVideoPlayer.prototype.createControls = function() {
 	}
 
 	// TIME
-	this.timeDisplay = createElementPro('.time', controlsContainer);
+	this.timeDisplay = createElementPro('.time', this.controlsContainer);
 	this.timeDisplay.innerHTML = '00:00';
 };
 

@@ -22,6 +22,21 @@
   cursor: pointer;
 }
 
+.video-controls .video-timeline {
+  width: 66%;
+  position: relative;
+}
+.video-controls .video-timeline.ios {
+  width: 70%;
+}
+.video-controls-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 5;
+  transition: all .2 ease-out;
+}
 .video-timeline {
   background: rgba(255, 255, 255, 0.4);
   bottom: 0;
@@ -66,17 +81,11 @@
 }
 
 /* VIDEO CONTROLS STYLES */
-.video-controls-wrapper {
-  position: relative;
-  margin: 0 auto;
-  padding: 0 20px 20px 20px;
-  max-width: 840px;
-}
 .video-controls {
   margin: 0;
   padding: 0 0.3em;
   display: block;
-  background-color: rgba(0,0,0,0.87);
+  background-color: rgba(0,0,0,0.3);
 }
 .video-controls > * {
   display: inline-block;
