@@ -38,7 +38,7 @@ var CanvasVideoPlayer = function(options) {
 	}
 	this.player 				= createElementPro('.video-wrapper', this.options.parent);
 	this.videoWrapper 	= createElementPro('.video-responsive', this.player);
-	this.video          = createElementPro('%video', this.videoWrapper, {src: this.options.videoSrc, preload: "auto"});
+	this.video          = createElementPro('%video', this.videoWrapper, {src: this.options.videoSrc});
 	this.canvas         = createElementPro('%canvas.canvas', this.videoWrapper);
 	this.errors         = [];
 	this.ready          = false;
@@ -222,11 +222,13 @@ CanvasVideoPlayer.prototype.bind = function() {
 	});
 
 	// Draws first frame
-	this.video.addEventListener('canplay', cvpHandlers.videoCanPlayHandler = function() {
-		self.drawFrame();
+	this.video.addEventListener('canplaythrough', cvpHandlers.videoCanPlayHandler = function() {
 		if (self.options.onReady && !self.ready){
-			self.options.onReady();
-			self.ready = true;
+			self.drawFrame();
+			setTimeout(function(){
+				self.ready = true;
+				self.options.onReady();
+			}, 3000); // Set delay in order to "ensure" draw video images on play
 		}
 	});
 
