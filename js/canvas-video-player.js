@@ -29,6 +29,7 @@ var CanvasVideoPlayer = function(options) {
 		onReady         : false,
 		onError         : false,
 		onEnded         : false,
+		timeUpdateFreq  : false,
 		dev             : true // In "dev" mode errors is showing
 	};
 
@@ -118,6 +119,10 @@ var CanvasVideoPlayer = function(options) {
 
 	this.resizeTimeoutReference = false;
 	this.RESIZE_TIMEOUT = 1000;
+	if (this.options.onTimeUpdate){
+		this.timeUpdateInterval = this.options.timeUpdateFreq || 280; // Interval for timeupdate
+	}
+	this.lastCurrentTime = 0;
 
 	this.init();
 	this.bind();
@@ -210,8 +215,8 @@ CanvasVideoPlayer.prototype.bind = function() {
 	// On every time update draws frame
 	this.video.addEventListener('timeupdate', cvpHandlers.videoTimeUpdateHandler = function() {
 		self.drawFrame();
-		self.updateTimeline();
 		if (self.controls){
+			self.updateTimeline();
 			self.updateTimeDisplay();
 		}
 	});
@@ -235,11 +240,13 @@ CanvasVideoPlayer.prototype.bind = function() {
 	}
 
 	// Click on the video seek video
-	this.timeline.addEventListener('click', function(e) {
-		var offset = e.clientX - self.getOffset(self.timeline).left;
-		var percentage = offset / self.timeline.offsetWidth;
-		self.jumpTo(percentage);
-	});
+	if (this.options.controls){
+		this.timeline.addEventListener('click', function(e) {
+			var offset = e.clientX - self.getOffset(self.timeline).left;
+			var percentage = offset / self.timeline.offsetWidth;
+			self.jumpTo(percentage);
+		});
+	}
 
 	// Cache canvas size on resize (doing it only once in a second)
 	window.addEventListener('resize', cvpHandlers.windowResizeHandler = function() {
@@ -354,6 +361,10 @@ CanvasVideoPlayer.prototype.loop = function() {
 		// Resync audio and video if they drift more than 300ms apart
 		if(this.audio && Math.abs(this.audio.currentTime - this.video.currentTime) > 0.3){
 			this.audio.currentTime = this.video.currentTime;
+		}
+		if(this.options.onTimeUpdate && Math.abs(this.video.currentTime - this.lastCurrentTime) > this.timeUpdateInterval/1000){
+			this.lastCurrentTime = this.video.currentTime;
+			this.options.onTimeUpdate();
 		}
 	}
 
