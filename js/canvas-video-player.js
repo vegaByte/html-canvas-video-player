@@ -38,7 +38,7 @@ var CanvasVideoPlayer = function(options) {
 	}
 	this.player 				= createElementPro('.video-wrapper', this.options.parent);
 	this.videoWrapper 	= createElementPro('.video-responsive', this.player);
-	this.video          = createElementPro('%video', this.videoWrapper, {src: this.options.videoSrc});
+	this.video          = createElementPro('%video', this.videoWrapper, {src: this.options.videoSrc, preload: "auto"});
 	this.canvas         = createElementPro('%canvas.canvas', this.videoWrapper);
 	this.errors         = [];
 	this.ready          = false;
@@ -334,7 +334,6 @@ CanvasVideoPlayer.prototype.pause = function() {
 		this.audio.pause();
 	}
 	if (this.options.onPause){
-		console.log('CanvasVideoPlayer.prototype.pause');
 		this.options.onPause();
 	}
 };
