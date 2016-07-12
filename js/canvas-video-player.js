@@ -224,6 +224,7 @@ CanvasVideoPlayer.prototype.bind = function() {
 	// Draws first frame
 	this.video.addEventListener('canplaythrough', cvpHandlers.videoCanPlayHandler = function() {
 		if (self.options.onReady && !self.ready){
+			self.setCanvasSize();
 			self.drawFrame();
 			setTimeout(function(){
 				self.ready = true;
