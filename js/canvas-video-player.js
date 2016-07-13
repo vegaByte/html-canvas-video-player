@@ -6,7 +6,9 @@ var cvpHandlers = {
 	errorLoadedHandler: null,
 	volumeUpdateHandler: null,
 	volumeChangeHandler: null,
-	playControlClickHandler: null
+	playControlClickHandler: null,
+	posterLoadHandler: null,
+	posterErrorHandler: null
 };
 
 var CanvasVideoPlayer = function(options) {
@@ -15,6 +17,7 @@ var CanvasVideoPlayer = function(options) {
 	this.options = {
 		videoSrc        : false, // Required if video element of "videoSelector" doesnt have <source> child
 		parent 					: false,
+		poster          : false,
 		controls        : true,
 		framesPerSecond : 25,
 		hideVideo       : true,
@@ -44,6 +47,11 @@ var CanvasVideoPlayer = function(options) {
 	this.ready          = false;
 	if (this.options.controls){
 		this.controls = createElementPro('.video-controls-wrapper', this.player);
+	}
+	var self = this;
+	if (this.options.poster){
+		this.posterWrapper = createElementPro('.canvas-player-poster-wrapper', this.videoWrapper);
+		this.poster = createElementPro('%img.canvas-player-poster', this.posterWrapper, {src: this.options.poster});
 	}
 
 	if (this.options.audio) {
@@ -158,6 +166,9 @@ CanvasVideoPlayer.prototype.init = function() {
 			console.error(self.errors.join(', '));
 		}
 	});
+	this.poster.addEventListener('error', cvpHandlers.posterErrorHandler = function(e) {
+		self.errors.push('The image poster clould not be loaded.');
+	});
 
 	if (this.controls){
 		this.createControls();
@@ -219,6 +230,11 @@ CanvasVideoPlayer.prototype.bind = function() {
 			self.updateTimeline();
 			self.updateTimeDisplay();
 		}
+		if (self.poster){
+			self.posterWrapper.removeChild(self.poster);
+			self.posterWrapper.parentElement.removeChild(self.posterWrapper);
+			self.poster = false;
+		}
 	});
 
 	// Draws first frame
@@ -250,6 +266,13 @@ CanvasVideoPlayer.prototype.bind = function() {
 			self.jumpTo(percentage);
 		});
 	}
+
+	// Define image orientation
+	this.poster.addEventListener('load', cvpHandlers.posterLoadHandler = function(){
+		if (self.poster.width > self.poster.height){
+			self.posterWrapper.className = self.posterWrapper.className + " horizontal";
+		}
+	});
 
 	// Cache canvas size on resize (doing it only once in a second)
 	window.addEventListener('resize', cvpHandlers.windowResizeHandler = function() {
@@ -292,6 +315,9 @@ CanvasVideoPlayer.prototype.bind = function() {
 			this.volumeControl.removeEventListener('change', cvpHandlers.volumeChangeHandler);
 			this.volumeControl.removeEventListener('input', cvpHandlers.volumeUpdateHandler);
 			this.playControl.removeEventListener('click', cvpHandlers.playControlClickHandler);
+		}
+		if (this.poster){
+			this.poster.removeEventListener('load', cvpHandlers.posterLoadHandler);
 		}
 	};
 };
