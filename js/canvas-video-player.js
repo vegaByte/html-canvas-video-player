@@ -402,7 +402,10 @@ CanvasVideoPlayer.prototype.loop = function() {
 
 	// If we are at the end of the video stop
 	if (this.video.currentTime >= this.video.duration) {
-		this.togglePlayElement();
+		// ifcontrols
+		if (this.controls){
+			this.togglePlayElement();
+		}
 		this.playing = false;
 		if (this.options.onEnded){
 			this.options.onEnded();
