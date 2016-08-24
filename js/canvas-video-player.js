@@ -166,9 +166,11 @@ CanvasVideoPlayer.prototype.init = function() {
 			console.error(self.errors.join(', '));
 		}
 	});
-	this.poster.addEventListener('error', cvpHandlers.posterErrorHandler = function(e) {
-		self.errors.push('The image poster clould not be loaded.');
-	});
+	if (this.options.poster){
+		this.poster.addEventListener('error', cvpHandlers.posterErrorHandler = function(e) {
+			self.errors.push('The image poster clould not be loaded.');
+		});
+	}
 
 	if (this.controls){
 		this.createControls();
@@ -268,15 +270,17 @@ CanvasVideoPlayer.prototype.bind = function() {
 	}
 
 	// Define image orientation
-	this.poster.addEventListener('load', cvpHandlers.posterLoadHandler = function(){
-		var scale = (self.posterWrapper.clientWidth / self.posterWrapper.clientHeight) < (self.poster.width / self.poster.height);
-		if (self.poster.width > self.poster.height && scale){
-			self.posterWrapper.className = self.posterWrapper.className + " horizontal";
-			var margin = (self.posterWrapper.clientHeight - self.poster.clientHeight)/2
-			self.poster.style.marginTop = margin+'px';
-		}
-		self.poster.style.opacity = 1;
-	});
+	if (this.options.poster){
+		this.poster.addEventListener('load', cvpHandlers.posterLoadHandler = function(){
+			var scale = (self.posterWrapper.clientWidth / self.posterWrapper.clientHeight) < (self.poster.width / self.poster.height);
+			if (self.poster.width > self.poster.height && scale){
+				self.posterWrapper.className = self.posterWrapper.className + " horizontal";
+				var margin = (self.posterWrapper.clientHeight - self.poster.clientHeight)/2
+				self.poster.style.marginTop = margin+'px';
+			}
+			self.poster.style.opacity = 1;
+		});
+	}
 
 	// Cache canvas size on resize (doing it only once in a second)
 	window.addEventListener('resize', cvpHandlers.windowResizeHandler = function() {
