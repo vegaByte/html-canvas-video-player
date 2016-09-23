@@ -128,7 +128,7 @@ var CanvasVideoPlayer = function(options) {
 	this.resizeTimeoutReference = false;
 	this.RESIZE_TIMEOUT = 1000;
 	if (this.options.onTimeUpdate){
-		this.timeUpdateInterval = this.options.timeUpdateFreq || 280; // Interval for timeupdate
+		this.timeUpdateInterval = this.options.timeUpdateFreq || 240; // Interval for timeupdate
 	}
 	this.lastCurrentTime = 0;
 
@@ -400,7 +400,7 @@ CanvasVideoPlayer.prototype.loop = function() {
 		}
 		if(this.options.onTimeUpdate && Math.abs(this.video.currentTime - this.lastCurrentTime) > this.timeUpdateInterval/1000){
 			this.lastCurrentTime = this.video.currentTime;
-			this.options.onTimeUpdate();
+			this.options.onTimeUpdate(this.video.currentTime);
 		}
 	}
 
@@ -432,10 +432,6 @@ CanvasVideoPlayer.prototype.loop = function() {
 	}
 	else {
 		cancelAnimationFrame(this.animationFrame);
-	}
-	// On time update callback
-	if (this.options.onTimeUpdate){
-		this.options.onTimeUpdate(this.video.currentTime);
 	}
 
 };
